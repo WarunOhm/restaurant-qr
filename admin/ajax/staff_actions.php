@@ -79,6 +79,18 @@ if ($action === 'save_staff') {
     }
 }
 
+if ($action === 'approve_staff') {
+    $user_id = intval($_POST['user_id']);
+
+    $query = "UPDATE users SET status = 'active' WHERE id = $user_id";
+
+    if (mysqli_query($conn, $query)) {
+        jsonResponse(true, 'อนุมัติพนักงานสำเร็จ');
+    } else {
+        jsonResponse(false, 'เกิดข้อผิดพลาดในการอนุมัติพนักงาน');
+    }
+}
+
 if ($action === 'delete_staff') {
     $user_id = intval($_POST['user_id']);
 

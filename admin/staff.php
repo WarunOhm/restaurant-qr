@@ -2,12 +2,33 @@
 $page_title = 'จัดการพนักงาน';
 require_once 'includes/header.php';
 
-// ดึงข้อมูลพนักงานทั้งหมด
-$staff_query = "SELECT * FROM users ORDER BY role ASC, created_at DESC";
+// นับจำนวนพนักงานที่รอการอนุมัติ
+$pending_query = "SELECT COUNT(*) as total FROM users WHERE status = 'inactive'";
+$pending_result = mysqli_query($conn, $pending_query);
+$pending_count = mysqli_fetch_assoc($pending_result)['total'];
+
+// ดึงข้อมูลพนักงานทั้งหมด (แบ่งตามสถานะ)
+$staff_query = "SELECT * FROM users ORDER BY
+    CASE WHEN status = 'inactive' THEN 0 ELSE 1 END,
+    role ASC,
+    created_at DESC";
 $staff = mysqli_query($conn, $staff_query);
 ?>
 
-<div class="row">
+<div class="row g-4">
+    <!-- แจ้งเตือนพนักงานรออนุมัติ -->
+    <?php if ($pending_count > 0): ?>
+    <div class="col-12">
+        <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+            <div class="flex-grow-1">
+                <h6 class="mb-1 fw-semibold">มีพนักงานรอการอนุมัติ!</h6>
+                <p class="mb-0">พบพนักงาน <strong><?php echo $pending_count; ?> คน</strong> ที่รอการอนุมัติเข้าใช้งานระบบ</p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-body">
@@ -29,37 +50,65 @@ $staff = mysqli_query($conn, $staff_query);
                                 <th>บทบาท</th>
                                 <th>สถานะ</th>
                                 <th>วันที่สร้าง</th>
-                                <th width="150">จัดการ</th>
+                                <th width="200">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php while ($user = mysqli_fetch_assoc($staff)): ?>
-                                <tr>
-                                    <td><strong><?php echo clean($user['username']); ?></strong></td>
+                                <tr <?php echo $user['status'] === 'inactive' ? 'class="table-warning"' : ''; ?>>
+                                    <td>
+                                        <strong><?php echo clean($user['username']); ?></strong>
+                                        <?php if ($user['status'] === 'inactive'): ?>
+                                            <span class="badge bg-warning text-dark ms-2">
+                                                <i class="fas fa-clock"></i> ใหม่
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?php echo clean($user['fullname']); ?></td>
                                     <td>
                                         <?php if ($user['role'] === 'admin'): ?>
-                                            <span class="badge bg-danger">ผู้ดูแลระบบ</span>
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-shield-alt"></i> ผู้ดูแลระบบ
+                                            </span>
                                         <?php else: ?>
-                                            <span class="badge bg-info">พนักงาน</span>
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-user"></i> พนักงาน
+                                            </span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if ($user['status'] === 'active'): ?>
-                                            <span class="badge bg-success">ใช้งาน</span>
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle"></i> ใช้งาน
+                                            </span>
                                         <?php else: ?>
-                                            <span class="badge bg-secondary">ปิดใช้งาน</span>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-clock"></i> รออนุมัติ
+                                            </span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><small><?php echo thaiDate($user['created_at'], 'short'); ?></small></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary" onclick='editStaff(<?php echo json_encode($user); ?>)'>
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteStaff(<?php echo $user['id']; ?>)">
-                                                <i class="fas fa-trash"></i>
+                                        <small><?php echo thaiDate($user['created_at'], 'short'); ?></small>
+                                    </td>
+                                    <td>
+                                        <?php if ($user['status'] === 'inactive'): ?>
+                                            <!-- ปุ่มสำหรับพนักงานรออนุมัติ -->
+                                            <button class="btn btn-sm btn-success" onclick="approveStaff(<?php echo $user['id']; ?>, '<?php echo clean($user['fullname']); ?>')" title="อนุมัติ">
+                                                <i class="fas fa-check"></i>
                                             </button>
+                                            <button class="btn btn-sm btn-danger" onclick="rejectStaff(<?php echo $user['id']; ?>, '<?php echo clean($user['fullname']); ?>')" title="ปฏิเสธ">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <!-- ปุ่มปกติสำหรับพนักงานที่อนุมัติแล้ว -->
+                                            <button class="btn btn-sm btn-outline-primary" onclick='editStaff(<?php echo json_encode($user); ?>)' title="แก้ไข">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteStaff(<?php echo $user['id']; ?>)" title="ลบ">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -166,6 +215,80 @@ document.getElementById('staffForm').addEventListener('submit', async function(e
         Toast.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' });
     }
 });
+
+async function approveStaff(id, fullname) {
+    const result = await Swal.fire({
+        title: 'อนุมัติพนักงาน',
+        html: `คุณต้องการอนุมัติ<br><strong>${fullname}</strong><br>ให้เข้าใช้งานระบบ?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="fas fa-check me-2"></i>อนุมัติ',
+        cancelButtonText: 'ยกเลิก'
+    });
+
+    if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('action', 'approve_staff');
+        formData.append('user_id', id);
+
+        try {
+            const response = await fetch('ajax/staff_actions.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Toast.fire({ icon: 'success', title: data.message });
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                Toast.fire({ icon: 'error', title: data.message });
+            }
+        } catch (error) {
+            Toast.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' });
+        }
+    }
+}
+
+async function rejectStaff(id, fullname) {
+    const result = await Swal.fire({
+        title: 'ปฏิเสธการสมัคร',
+        html: `คุณต้องการปฏิเสธการสมัครของ<br><strong>${fullname}</strong>?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="fas fa-times me-2"></i>ปฏิเสธ',
+        cancelButtonText: 'ยกเลิก'
+    });
+
+    if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('action', 'delete_staff');
+        formData.append('user_id', id);
+
+        try {
+            const response = await fetch('ajax/staff_actions.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Toast.fire({ icon: 'success', title: 'ปฏิเสธการสมัครสำเร็จ' });
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                Toast.fire({ icon: 'error', title: data.message });
+            }
+        } catch (error) {
+            Toast.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' });
+        }
+    }
+}
 
 async function deleteStaff(id) {
     const result = await confirmDelete('คุณต้องการลบพนักงานคนนี้?');

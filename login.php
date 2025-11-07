@@ -208,6 +208,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </form>
 
                         <div class="text-center mt-4 pt-3 border-top">
+                            <p class="mb-2">
+                                ยังไม่มีบัญชี?
+                                <a href="register.php" class="text-primary fw-semibold">
+                                    <i class="fas fa-user-plus me-1"></i>สมัครเข้าร่วมทีม
+                                </a>
+                            </p>
                             <small class="text-muted">
                                 <i class="fas fa-info-circle me-1"></i>
                                 ใช้งานได้เฉพาะแอดมินและพนักงานเท่านั้น
