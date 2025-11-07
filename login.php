@@ -46,12 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- TailwindCSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Google Fonts - Prompt -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- SweetAlert2 -->
@@ -64,170 +59,206 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         * {
             font-family: 'Prompt', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 450px;
+            width: 100%;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             overflow: hidden;
         }
 
         .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
+            padding: 3rem 2rem 2rem;
             text-align: center;
+            background: white;
+        }
+
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-circle i {
+            font-size: 2rem;
             color: white;
         }
 
-        .login-icon {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        .login-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
         }
 
-        .login-icon i {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .login-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.5rem;
         }
 
         .form-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 20px;
-            transition: all 0.3s;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: #f8fafc;
         }
 
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-
-        .form-control-icon {
-            padding-left: 45px;
+            outline: none;
+            border-color: #3B82F6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
         .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 600;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
             color: white;
-            transition: all 0.3s;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
         }
 
-        .wave {
-            animation: wave 3s ease-in-out infinite;
-            display: inline-block;
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        @keyframes wave {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(20deg); }
-            75% { transform: rotate(-20deg); }
+        .register-link {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            background: #f8fafc;
+        }
+
+        .register-link a {
+            color: #3B82F6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .register-link a:hover {
+            color: #2563EB;
+        }
+
+        @media (max-width: 576px) {
+            .login-header {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .login-body {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="login-card">
-                    <div class="login-header">
-                        <div class="login-icon">
-                            <i class="fas fa-utensils"></i>
-                        </div>
-                        <h2 class="mb-0 fw-bold">Restaurant QR</h2>
-                        <p class="mb-0 mt-2">ระบบจัดการร้านอาหาร</p>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-circle">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h1>ยินดีต้อนรับ</h1>
+                <p>เข้าสู่ระบบจัดการร้านอาหาร</p>
+            </div>
+
+            <div class="login-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user me-1"></i>ชื่อผู้ใช้
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="username"
+                            placeholder="กรอกชื่อผู้ใช้"
+                            required
+                            autocomplete="username"
+                        >
                     </div>
 
-                    <div class="p-4">
-                        <h5 class="text-center mb-4 fw-semibold text-gray-700">
-                            เข้าสู่ระบบ <span class="wave">👋</span>
-                        </h5>
-
-                        <form id="loginForm">
-                            <div class="mb-3 position-relative">
-                                <i class="fas fa-user input-icon"></i>
-                                <input
-                                    type="text"
-                                    class="form-control form-control-icon"
-                                    name="username"
-                                    placeholder="ชื่อผู้ใช้"
-                                    required
-                                    autocomplete="username"
-                                >
-                            </div>
-
-                            <div class="mb-3 position-relative">
-                                <i class="fas fa-lock input-icon"></i>
-                                <input
-                                    type="password"
-                                    class="form-control form-control-icon"
-                                    name="password"
-                                    placeholder="รหัสผ่าน"
-                                    required
-                                    autocomplete="current-password"
-                                >
-                            </div>
-
-                            <button type="submit" class="btn btn-login w-100 mt-3">
-                                <i class="fas fa-sign-in-alt me-2"></i>เข้าสู่ระบบ
-                            </button>
-                        </form>
-
-                        <div class="text-center mt-4 pt-3 border-top">
-                            <p class="mb-2">
-                                ยังไม่มีบัญชี?
-                                <a href="register.php" class="text-primary fw-semibold">
-                                    <i class="fas fa-user-plus me-1"></i>สมัครเข้าร่วมทีม
-                                </a>
-                            </p>
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i>
-                                ใช้งานได้เฉพาะแอดมินและพนักงานเท่านั้น
-                            </small>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-lock me-1"></i>รหัสผ่าน
+                        </label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            name="password"
+                            placeholder="กรอกรหัสผ่าน"
+                            required
+                            autocomplete="current-password"
+                        >
                     </div>
-                </div>
 
-                <div class="text-center mt-3">
-                    <small class="text-white">
-                        <i class="fas fa-shield-alt me-1"></i>
-                        Powered by Restaurant QR System v1.0
-                    </small>
-                </div>
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt me-2"></i>เข้าสู่ระบบ
+                    </button>
+                </form>
+            </div>
+
+            <div class="register-link">
+                ยังไม่มีบัญชี? <a href="register.php">สมัครเข้าร่วมทีม</a>
             </div>
         </div>
     </div>
@@ -271,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         icon: 'error',
                         title: 'เข้าสู่ระบบไม่สำเร็จ',
                         text: result.message,
-                        confirmButtonColor: '#667eea'
+                        confirmButtonColor: '#3B82F6'
                     });
 
                     button.disabled = false;
@@ -282,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     icon: 'error',
                     title: 'เกิดข้อผิดพลาด',
                     text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์',
-                    confirmButtonColor: '#667eea'
+                    confirmButtonColor: '#3B82F6'
                 });
 
                 button.disabled = false;
